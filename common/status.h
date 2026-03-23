@@ -5,14 +5,19 @@
 #include <sstream>
 #include <vector>
 #include <iomanip>
+#include <cstdlib>
+#include <memory>
+#include "log.h"
 
-// Windows 特定头文件
+#ifdef _WIN32
 #include <windows.h>
 #include <dbghelp.h>
 #include <mutex>
-
-// 链接库指令 (如果在 IDE 中未自动链接，需手动添加 Dbghelp.lib)
 #pragma comment(lib, "Dbghelp.lib")
+#else
+#include <execinfo.h>
+#include <cxxabi.h>
+#endif
 
 // ==========================================
 // 错误码定义
@@ -55,25 +60,24 @@ public:
     std::string toString() const {
         if (ok_) return "Status: OK";
 
-        std::ostringstream oss;
-        oss << "========================================\n";
-        oss << "ERROR DETECTED\n";
-        oss << "========================================\n";
-        oss << "Message: " << msg_ << "\n";
-        oss << "Location: " << func_ << " ()\n";
-        oss << "          File: " << file_ << "\n";
-        oss << "          Line: " << line_ << "\n";
-        oss << "----------------------------------------\n";
-        oss << "Call Stack:\n" << stackTrace_;
-        oss << "========================================\n";
-        return oss.str();
+        LOG(LogLevel::ERROR) << "========================================\n";
+        LOG(LogLevel::ERROR) << "ERROR DETECTED\n";
+        LOG(LogLevel::ERROR) << "Message: " << msg_ << "\n";
+        LOG(LogLevel::ERROR) << "----------------------------------------\n";
+        LOG(LogLevel::ERROR) << "Call Stack:\n" << stackTrace_;
+        LOG(LogLevel::ERROR) << "Location: " << func_ << " ()\n";
+        LOG(LogLevel::ERROR) << "          File: " << file_ << "\n";
+        LOG(LogLevel::ERROR) << "          Line: " << line_ << "\n";
+        LOG(LogLevel::ERROR) << "----------------------------------------\n";
+        LOG(LogLevel::ERROR) << "Call Stack:\n" << stackTrace_;
+        LOG(LogLevel::ERROR) << "========================================\n";
     }
 
 private:
     DetailedStatus(bool ok) : ok_(ok), line_(0) {}
 
-    // Windows 专用的堆栈捕获与符号解析
     static std::string captureStackTrace() {
+#ifdef _WIN32
         // 1. 初始化符号处理器 (每个进程只需一次，但为了简单这里每次检查)
         // 注意：SymInitialize 不是线程安全的，实际生产环境应在全局初始化一次
         static std::mutex symMutex;
@@ -81,10 +85,7 @@ private:
 
         static bool symbolsInitialized = false;
         if (!symbolsInitialized) {
-            // 获取当前进程句柄
             HANDLE process = GetCurrentProcess();
-            // 初始化符号，加载当前模块的 PDB 信息
-            // SymSetOptions 可以设置更详细的选项，如 SYMOPT_LOAD_LINES 以获取行号
             SymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES);
             if (SymInitialize(process, NULL, TRUE)) {
                 symbolsInitialized = true;
@@ -96,17 +97,14 @@ private:
 
         HANDLE process = GetCurrentProcess();
 
-        // 2. 捕获堆栈帧 (最多 62 层，Windows API 限制)
         void* stack[62];
         USHORT frames = CaptureStackBackTrace(0, 62, stack, NULL);
 
         std::ostringstream oss;
 
-        // 3. 解析每一帧
         for (USHORT i = 0; i < frames; ++i) {
             DWORD64 address = (DWORD64)(stack[i]);
 
-            // 准备符号信息结构
             char symbolBuffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
             PSYMBOL_INFO pSymbol = (PSYMBOL_INFO)symbolBuffer;
             pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
@@ -115,12 +113,10 @@ private:
             DWORD64 symbolDisplacement = 0;
             std::string functionName = "UnknownFunction";
 
-            // 尝试获取函数名
             if (SymFromAddr(process, address, &symbolDisplacement, pSymbol)) {
                 functionName = pSymbol->Name;
             }
 
-            // 尝试获取源文件和行号
             std::string sourceFile = "UnknownFile";
             DWORD lineNumber = 0;
             DWORD lineDisplacement = 0;
@@ -130,19 +126,59 @@ private:
             if (SymGetLineFromAddr64(process, address, &lineDisplacement, &lineInfo)) {
                 sourceFile = lineInfo.FileName;
                 lineNumber = lineInfo.LineNumber;
-
-                // 格式化输出：FuncName [File:Line]
                 oss << "  #" << i << " " << functionName
                     << " [" << sourceFile << ":" << lineNumber << "]\n";
             }
             else {
-                // 如果没有行号信息（例如没有 PDB 或优化过），只显示函数和地址
                 oss << "  #" << i << " " << functionName
                     << " [Address: 0x" << std::hex << address << std::dec << "]\n";
             }
         }
 
         return oss.str();
+#else
+        constexpr int kMaxFrames = 64;
+        void* frames[kMaxFrames];
+        int frameCount = backtrace(frames, kMaxFrames);
+        if (frameCount <= 0) {
+            LOG(LogLevel::ERROR) << "No stack trace available.\n";
+            return "No stack trace available.\n";
+        }
+
+        char** symbols = backtrace_symbols(frames, frameCount);
+        if (symbols == nullptr) {
+            LOG(LogLevel::ERROR) << "Failed to resolve stack symbols.\n";
+            return "Failed to resolve stack symbols.\n";
+        }
+
+        std::unique_ptr<char*, decltype(&std::free)> holder(symbols, &std::free);
+        std::ostringstream oss;
+
+        for (int i = 0; i < frameCount; ++i) {
+            std::string symbolLine = symbols[i];
+            std::string functionName = symbolLine;
+
+            // Common Linux pattern:
+            // /path/bin(function+0x15c) [0x55...]
+            std::size_t left = symbolLine.find('(');
+            std::size_t plus = symbolLine.find('+', left);
+            if (left != std::string::npos && plus != std::string::npos && plus > left + 1) {
+                std::string mangled = symbolLine.substr(left + 1, plus - left - 1);
+                int status = 0;
+                std::unique_ptr<char, decltype(&std::free)> demangled(
+                    abi::__cxa_demangle(mangled.c_str(), nullptr, nullptr, &status), &std::free);
+                if (status == 0 && demangled) {
+                    functionName = demangled.get();
+                } else {
+                    functionName = mangled;
+                }
+            }
+
+            oss << "  #" << i << " " << functionName << "\n";
+        }
+
+        return oss.str();
+#endif
     }
 
     bool ok_;

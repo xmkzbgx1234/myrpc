@@ -54,6 +54,37 @@ struct ResultCodeDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ResultCodeDefaultTypeInternal _ResultCode_default_instance_;
 
+inline constexpr RegisterRequest::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        pwd_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        userid_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR RegisterRequest::RegisterRequest(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(RegisterRequest_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct RegisterRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR RegisterRequestDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~RegisterRequestDefaultTypeInternal() {}
+  union {
+    RegisterRequest _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 RegisterRequestDefaultTypeInternal _RegisterRequest_default_instance_;
+
 inline constexpr LoginRequest::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : _cached_size_{0},
@@ -83,6 +114,32 @@ struct LoginRequestDefaultTypeInternal {
 
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 LoginRequestDefaultTypeInternal _LoginRequest_default_instance_;
+
+inline constexpr RegisterResponse::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        rescode_{nullptr},
+        success_{false} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR RegisterResponse::RegisterResponse(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(RegisterResponse_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct RegisterResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR RegisterResponseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~RegisterResponseDefaultTypeInternal() {}
+  union {
+    RegisterResponse _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 RegisterResponseDefaultTypeInternal _RegisterResponse_default_instance_;
 
 inline constexpr LoginResponse::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
@@ -153,6 +210,32 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::fixbug::LoginResponse, _impl_.success_),
         0,
         1,
+        PROTOBUF_FIELD_OFFSET(::fixbug::RegisterRequest, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::fixbug::RegisterRequest, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::fixbug::RegisterRequest, _impl_.userid_),
+        PROTOBUF_FIELD_OFFSET(::fixbug::RegisterRequest, _impl_.name_),
+        PROTOBUF_FIELD_OFFSET(::fixbug::RegisterRequest, _impl_.pwd_),
+        2,
+        0,
+        1,
+        PROTOBUF_FIELD_OFFSET(::fixbug::RegisterResponse, _impl_._has_bits_),
+        PROTOBUF_FIELD_OFFSET(::fixbug::RegisterResponse, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::fixbug::RegisterResponse, _impl_.rescode_),
+        PROTOBUF_FIELD_OFFSET(::fixbug::RegisterResponse, _impl_.success_),
+        0,
+        1,
 };
 
 static const ::_pbi::MigrationSchema
@@ -160,11 +243,15 @@ static const ::_pbi::MigrationSchema
         {0, 10, -1, sizeof(::fixbug::ResultCode)},
         {12, 22, -1, sizeof(::fixbug::LoginRequest)},
         {24, 34, -1, sizeof(::fixbug::LoginResponse)},
+        {36, 47, -1, sizeof(::fixbug::RegisterRequest)},
+        {50, 60, -1, sizeof(::fixbug::RegisterResponse)},
 };
 static const ::_pb::Message* PROTOBUF_NONNULL const file_default_instances[] = {
     &::fixbug::_ResultCode_default_instance_._instance,
     &::fixbug::_LoginRequest_default_instance_._instance,
     &::fixbug::_LoginResponse_default_instance_._instance,
+    &::fixbug::_RegisterRequest_default_instance_._instance,
+    &::fixbug::_RegisterResponse_default_instance_._instance,
 };
 const char descriptor_table_protodef_user_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
@@ -172,21 +259,26 @@ const char descriptor_table_protodef_user_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIA
     "rcode\030\001 \001(\005\022\017\n\007message\030\002 \001(\014\")\n\014LoginReq"
     "uest\022\014\n\004name\030\001 \001(\014\022\013\n\003pwd\030\002 \001(\014\"E\n\rLogin"
     "Response\022#\n\007rescode\030\001 \001(\0132\022.fixbug.Resul"
-    "tCode\022\017\n\007success\030\002 \001(\0102F\n\016UserServiceRpc"
-    "\0224\n\005Login\022\024.fixbug.LoginRequest\032\025.fixbug"
-    ".LoginResponseB\003\200\001\001b\006proto3"
+    "tCode\022\017\n\007success\030\002 \001(\010\"<\n\017RegisterReques"
+    "t\022\016\n\006userid\030\001 \001(\005\022\014\n\004name\030\002 \001(\014\022\013\n\003pwd\030\003"
+    " \001(\014\"H\n\020RegisterResponse\022#\n\007rescode\030\001 \001("
+    "\0132\022.fixbug.ResultCode\022\017\n\007success\030\002 \001(\0102\205"
+    "\001\n\016UserServiceRpc\0224\n\005Login\022\024.fixbug.Logi"
+    "nRequest\032\025.fixbug.LoginResponse\022=\n\010Regis"
+    "ter\022\027.fixbug.RegisterRequest\032\030.fixbug.Re"
+    "gisterResponseB\003\200\001\001b\006proto3"
 };
 static ::absl::once_flag descriptor_table_user_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_user_2eproto = {
     false,
     false,
-    267,
+    467,
     descriptor_table_protodef_user_2eproto,
     "user.proto",
     &descriptor_table_user_2eproto_once,
     nullptr,
     0,
-    3,
+    5,
     schemas,
     file_default_instances,
     TableStruct_user_2eproto::offsets,
@@ -1083,6 +1175,635 @@ void LoginResponse::InternalSwap(LoginResponse* PROTOBUF_RESTRICT PROTOBUF_NONNU
 }
 // ===================================================================
 
+class RegisterRequest::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<RegisterRequest>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(RegisterRequest, _impl_._has_bits_);
+};
+
+RegisterRequest::RegisterRequest(::google::protobuf::Arena* PROTOBUF_NULLABLE arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, RegisterRequest_class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:fixbug.RegisterRequest)
+}
+PROTOBUF_NDEBUG_INLINE RegisterRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* PROTOBUF_NULLABLE arena, const Impl_& from,
+    const ::fixbug::RegisterRequest& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        name_(arena, from.name_),
+        pwd_(arena, from.pwd_) {}
+
+RegisterRequest::RegisterRequest(
+    ::google::protobuf::Arena* PROTOBUF_NULLABLE arena,
+    const RegisterRequest& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, RegisterRequest_class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  RegisterRequest* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  _impl_.userid_ = from._impl_.userid_;
+
+  // @@protoc_insertion_point(copy_constructor:fixbug.RegisterRequest)
+}
+PROTOBUF_NDEBUG_INLINE RegisterRequest::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* PROTOBUF_NULLABLE arena)
+      : _cached_size_{0},
+        name_(arena),
+        pwd_(arena) {}
+
+inline void RegisterRequest::SharedCtor(::_pb::Arena* PROTOBUF_NULLABLE arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.userid_ = {};
+}
+RegisterRequest::~RegisterRequest() {
+  // @@protoc_insertion_point(destructor:fixbug.RegisterRequest)
+  SharedDtor(*this);
+}
+inline void RegisterRequest::SharedDtor(MessageLite& self) {
+  RegisterRequest& this_ = static_cast<RegisterRequest&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.name_.Destroy();
+  this_._impl_.pwd_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* PROTOBUF_NONNULL RegisterRequest::PlacementNew_(
+    const void* PROTOBUF_NONNULL, void* PROTOBUF_NONNULL mem,
+    ::google::protobuf::Arena* PROTOBUF_NULLABLE arena) {
+  return ::new (mem) RegisterRequest(arena);
+}
+constexpr auto RegisterRequest::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(RegisterRequest),
+                                            alignof(RegisterRequest));
+}
+constexpr auto RegisterRequest::InternalGenerateClassData_() {
+  return ::google::protobuf::internal::ClassDataFull{
+      ::google::protobuf::internal::ClassData{
+          &_RegisterRequest_default_instance_._instance,
+          &_table_.header,
+          nullptr,  // OnDemandRegisterArenaDtor
+          nullptr,  // IsInitialized
+          &RegisterRequest::MergeImpl,
+          ::google::protobuf::Message::GetNewImpl<RegisterRequest>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+          &RegisterRequest::SharedDtor,
+          ::google::protobuf::Message::GetClearImpl<RegisterRequest>(), &RegisterRequest::ByteSizeLong,
+              &RegisterRequest::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          PROTOBUF_FIELD_OFFSET(RegisterRequest, _impl_._cached_size_),
+          false,
+      },
+      &RegisterRequest::kDescriptorMethods,
+      &descriptor_table_user_2eproto,
+      nullptr,  // tracker
+  };
+}
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 const
+    ::google::protobuf::internal::ClassDataFull RegisterRequest_class_data_ =
+        RegisterRequest::InternalGenerateClassData_();
+
+const ::google::protobuf::internal::ClassData* PROTOBUF_NONNULL RegisterRequest::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&RegisterRequest_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(RegisterRequest_class_data_.tc_table);
+  return RegisterRequest_class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 3, 0, 0, 2>
+RegisterRequest::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(RegisterRequest, _impl_._has_bits_),
+    0, // no _extensions_
+    3, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967288,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    3,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    RegisterRequest_class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::fixbug::RegisterRequest>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // int32 userid = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(RegisterRequest, _impl_.userid_), 2>(),
+     {8, 2, 0, PROTOBUF_FIELD_OFFSET(RegisterRequest, _impl_.userid_)}},
+    // bytes name = 2;
+    {::_pbi::TcParser::FastBS1,
+     {18, 0, 0, PROTOBUF_FIELD_OFFSET(RegisterRequest, _impl_.name_)}},
+    // bytes pwd = 3;
+    {::_pbi::TcParser::FastBS1,
+     {26, 1, 0, PROTOBUF_FIELD_OFFSET(RegisterRequest, _impl_.pwd_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // int32 userid = 1;
+    {PROTOBUF_FIELD_OFFSET(RegisterRequest, _impl_.userid_), _Internal::kHasBitsOffset + 2, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kInt32)},
+    // bytes name = 2;
+    {PROTOBUF_FIELD_OFFSET(RegisterRequest, _impl_.name_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBytes | ::_fl::kRepAString)},
+    // bytes pwd = 3;
+    {PROTOBUF_FIELD_OFFSET(RegisterRequest, _impl_.pwd_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBytes | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+PROTOBUF_NOINLINE void RegisterRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:fixbug.RegisterRequest)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _impl_._has_bits_[0];
+  if ((cached_has_bits & 0x00000003u) != 0) {
+    if ((cached_has_bits & 0x00000001u) != 0) {
+      _impl_.name_.ClearNonDefaultToEmpty();
+    }
+    if ((cached_has_bits & 0x00000002u) != 0) {
+      _impl_.pwd_.ClearNonDefaultToEmpty();
+    }
+  }
+  _impl_.userid_ = 0;
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+::uint8_t* PROTOBUF_NONNULL RegisterRequest::_InternalSerialize(
+    const ::google::protobuf::MessageLite& base, ::uint8_t* PROTOBUF_NONNULL target,
+    ::google::protobuf::io::EpsCopyOutputStream* PROTOBUF_NONNULL stream) {
+  const RegisterRequest& this_ = static_cast<const RegisterRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+::uint8_t* PROTOBUF_NONNULL RegisterRequest::_InternalSerialize(
+    ::uint8_t* PROTOBUF_NONNULL target,
+    ::google::protobuf::io::EpsCopyOutputStream* PROTOBUF_NONNULL stream) const {
+  const RegisterRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  // @@protoc_insertion_point(serialize_to_array_start:fixbug.RegisterRequest)
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
+
+  // int32 userid = 1;
+  if ((this_._impl_._has_bits_[0] & 0x00000004u) != 0) {
+    if (this_._internal_userid() != 0) {
+      target =
+          ::google::protobuf::internal::WireFormatLite::WriteInt32ToArrayWithField<1>(
+              stream, this_._internal_userid(), target);
+    }
+  }
+
+  // bytes name = 2;
+  if ((this_._impl_._has_bits_[0] & 0x00000001u) != 0) {
+    if (!this_._internal_name().empty()) {
+      const std::string& _s = this_._internal_name();
+      target = stream->WriteBytesMaybeAliased(2, _s, target);
+    }
+  }
+
+  // bytes pwd = 3;
+  if ((this_._impl_._has_bits_[0] & 0x00000002u) != 0) {
+    if (!this_._internal_pwd().empty()) {
+      const std::string& _s = this_._internal_pwd();
+      target = stream->WriteBytesMaybeAliased(3, _s, target);
+    }
+  }
+
+  if (ABSL_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:fixbug.RegisterRequest)
+  return target;
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+::size_t RegisterRequest::ByteSizeLong(const MessageLite& base) {
+  const RegisterRequest& this_ = static_cast<const RegisterRequest&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+::size_t RegisterRequest::ByteSizeLong() const {
+  const RegisterRequest& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  // @@protoc_insertion_point(message_byte_size_start:fixbug.RegisterRequest)
+  ::size_t total_size = 0;
+
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void)cached_has_bits;
+
+  ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+  cached_has_bits = this_._impl_._has_bits_[0];
+  if ((cached_has_bits & 0x00000007u) != 0) {
+    // bytes name = 2;
+    if ((cached_has_bits & 0x00000001u) != 0) {
+      if (!this_._internal_name().empty()) {
+        total_size += 1 + ::google::protobuf::internal::WireFormatLite::BytesSize(
+                                        this_._internal_name());
+      }
+    }
+    // bytes pwd = 3;
+    if ((cached_has_bits & 0x00000002u) != 0) {
+      if (!this_._internal_pwd().empty()) {
+        total_size += 1 + ::google::protobuf::internal::WireFormatLite::BytesSize(
+                                        this_._internal_pwd());
+      }
+    }
+    // int32 userid = 1;
+    if ((cached_has_bits & 0x00000004u) != 0) {
+      if (this_._internal_userid() != 0) {
+        total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
+            this_._internal_userid());
+      }
+    }
+  }
+  return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                             &this_._impl_._cached_size_);
+}
+
+void RegisterRequest::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<RegisterRequest*>(&to_msg);
+  auto& from = static_cast<const RegisterRequest&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:fixbug.RegisterRequest)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._impl_._has_bits_[0];
+  if ((cached_has_bits & 0x00000007u) != 0) {
+    if ((cached_has_bits & 0x00000001u) != 0) {
+      if (!from._internal_name().empty()) {
+        _this->_internal_set_name(from._internal_name());
+      } else {
+        if (_this->_impl_.name_.IsDefault()) {
+          _this->_internal_set_name("");
+        }
+      }
+    }
+    if ((cached_has_bits & 0x00000002u) != 0) {
+      if (!from._internal_pwd().empty()) {
+        _this->_internal_set_pwd(from._internal_pwd());
+      } else {
+        if (_this->_impl_.pwd_.IsDefault()) {
+          _this->_internal_set_pwd("");
+        }
+      }
+    }
+    if ((cached_has_bits & 0x00000004u) != 0) {
+      if (from._internal_userid() != 0) {
+        _this->_impl_.userid_ = from._impl_.userid_;
+      }
+    }
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void RegisterRequest::CopyFrom(const RegisterRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:fixbug.RegisterRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void RegisterRequest::InternalSwap(RegisterRequest* PROTOBUF_RESTRICT PROTOBUF_NONNULL other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, &other->_impl_.name_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.pwd_, &other->_impl_.pwd_, arena);
+  swap(_impl_.userid_, other->_impl_.userid_);
+}
+
+::google::protobuf::Metadata RegisterRequest::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class RegisterResponse::_Internal {
+ public:
+  using HasBits =
+      decltype(std::declval<RegisterResponse>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+      8 * PROTOBUF_FIELD_OFFSET(RegisterResponse, _impl_._has_bits_);
+};
+
+RegisterResponse::RegisterResponse(::google::protobuf::Arena* PROTOBUF_NULLABLE arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, RegisterResponse_class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:fixbug.RegisterResponse)
+}
+PROTOBUF_NDEBUG_INLINE RegisterResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* PROTOBUF_NULLABLE arena, const Impl_& from,
+    const ::fixbug::RegisterResponse& from_msg)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0} {}
+
+RegisterResponse::RegisterResponse(
+    ::google::protobuf::Arena* PROTOBUF_NULLABLE arena,
+    const RegisterResponse& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, RegisterResponse_class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  RegisterResponse* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.rescode_ = ((cached_has_bits & 0x00000001u) != 0)
+                ? ::google::protobuf::Message::CopyConstruct(arena, *from._impl_.rescode_)
+                : nullptr;
+  _impl_.success_ = from._impl_.success_;
+
+  // @@protoc_insertion_point(copy_constructor:fixbug.RegisterResponse)
+}
+PROTOBUF_NDEBUG_INLINE RegisterResponse::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* PROTOBUF_NULLABLE arena)
+      : _cached_size_{0} {}
+
+inline void RegisterResponse::SharedCtor(::_pb::Arena* PROTOBUF_NULLABLE arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, rescode_),
+           0,
+           offsetof(Impl_, success_) -
+               offsetof(Impl_, rescode_) +
+               sizeof(Impl_::success_));
+}
+RegisterResponse::~RegisterResponse() {
+  // @@protoc_insertion_point(destructor:fixbug.RegisterResponse)
+  SharedDtor(*this);
+}
+inline void RegisterResponse::SharedDtor(MessageLite& self) {
+  RegisterResponse& this_ = static_cast<RegisterResponse&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  delete this_._impl_.rescode_;
+  this_._impl_.~Impl_();
+}
+
+inline void* PROTOBUF_NONNULL RegisterResponse::PlacementNew_(
+    const void* PROTOBUF_NONNULL, void* PROTOBUF_NONNULL mem,
+    ::google::protobuf::Arena* PROTOBUF_NULLABLE arena) {
+  return ::new (mem) RegisterResponse(arena);
+}
+constexpr auto RegisterResponse::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(RegisterResponse),
+                                            alignof(RegisterResponse));
+}
+constexpr auto RegisterResponse::InternalGenerateClassData_() {
+  return ::google::protobuf::internal::ClassDataFull{
+      ::google::protobuf::internal::ClassData{
+          &_RegisterResponse_default_instance_._instance,
+          &_table_.header,
+          nullptr,  // OnDemandRegisterArenaDtor
+          nullptr,  // IsInitialized
+          &RegisterResponse::MergeImpl,
+          ::google::protobuf::Message::GetNewImpl<RegisterResponse>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+          &RegisterResponse::SharedDtor,
+          ::google::protobuf::Message::GetClearImpl<RegisterResponse>(), &RegisterResponse::ByteSizeLong,
+              &RegisterResponse::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          PROTOBUF_FIELD_OFFSET(RegisterResponse, _impl_._cached_size_),
+          false,
+      },
+      &RegisterResponse::kDescriptorMethods,
+      &descriptor_table_user_2eproto,
+      nullptr,  // tracker
+  };
+}
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 const
+    ::google::protobuf::internal::ClassDataFull RegisterResponse_class_data_ =
+        RegisterResponse::InternalGenerateClassData_();
+
+const ::google::protobuf::internal::ClassData* PROTOBUF_NONNULL RegisterResponse::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&RegisterResponse_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(RegisterResponse_class_data_.tc_table);
+  return RegisterResponse_class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 1, 0, 2>
+RegisterResponse::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(RegisterResponse, _impl_._has_bits_),
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    RegisterResponse_class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::fixbug::RegisterResponse>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // bool success = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(RegisterResponse, _impl_.success_), 1>(),
+     {16, 1, 0, PROTOBUF_FIELD_OFFSET(RegisterResponse, _impl_.success_)}},
+    // .fixbug.ResultCode rescode = 1;
+    {::_pbi::TcParser::FastMtS1,
+     {10, 0, 0, PROTOBUF_FIELD_OFFSET(RegisterResponse, _impl_.rescode_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // .fixbug.ResultCode rescode = 1;
+    {PROTOBUF_FIELD_OFFSET(RegisterResponse, _impl_.rescode_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // bool success = 2;
+    {PROTOBUF_FIELD_OFFSET(RegisterResponse, _impl_.success_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+  }},
+  {{
+      {::_pbi::TcParser::GetTable<::fixbug::ResultCode>()},
+  }},
+  {{
+  }},
+};
+PROTOBUF_NOINLINE void RegisterResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:fixbug.RegisterResponse)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _impl_._has_bits_[0];
+  if ((cached_has_bits & 0x00000001u) != 0) {
+    ABSL_DCHECK(_impl_.rescode_ != nullptr);
+    _impl_.rescode_->Clear();
+  }
+  _impl_.success_ = false;
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+::uint8_t* PROTOBUF_NONNULL RegisterResponse::_InternalSerialize(
+    const ::google::protobuf::MessageLite& base, ::uint8_t* PROTOBUF_NONNULL target,
+    ::google::protobuf::io::EpsCopyOutputStream* PROTOBUF_NONNULL stream) {
+  const RegisterResponse& this_ = static_cast<const RegisterResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+::uint8_t* PROTOBUF_NONNULL RegisterResponse::_InternalSerialize(
+    ::uint8_t* PROTOBUF_NONNULL target,
+    ::google::protobuf::io::EpsCopyOutputStream* PROTOBUF_NONNULL stream) const {
+  const RegisterResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  // @@protoc_insertion_point(serialize_to_array_start:fixbug.RegisterResponse)
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
+
+  cached_has_bits = this_._impl_._has_bits_[0];
+  // .fixbug.ResultCode rescode = 1;
+  if ((cached_has_bits & 0x00000001u) != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        1, *this_._impl_.rescode_, this_._impl_.rescode_->GetCachedSize(), target,
+        stream);
+  }
+
+  // bool success = 2;
+  if ((cached_has_bits & 0x00000002u) != 0) {
+    if (this_._internal_success() != 0) {
+      target = stream->EnsureSpace(target);
+      target = ::_pbi::WireFormatLite::WriteBoolToArray(
+          2, this_._internal_success(), target);
+    }
+  }
+
+  if (ABSL_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:fixbug.RegisterResponse)
+  return target;
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+::size_t RegisterResponse::ByteSizeLong(const MessageLite& base) {
+  const RegisterResponse& this_ = static_cast<const RegisterResponse&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+::size_t RegisterResponse::ByteSizeLong() const {
+  const RegisterResponse& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  // @@protoc_insertion_point(message_byte_size_start:fixbug.RegisterResponse)
+  ::size_t total_size = 0;
+
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void)cached_has_bits;
+
+  ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+  cached_has_bits = this_._impl_._has_bits_[0];
+  if ((cached_has_bits & 0x00000003u) != 0) {
+    // .fixbug.ResultCode rescode = 1;
+    if ((cached_has_bits & 0x00000001u) != 0) {
+      total_size += 1 +
+                    ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.rescode_);
+    }
+    // bool success = 2;
+    if ((cached_has_bits & 0x00000002u) != 0) {
+      if (this_._internal_success() != 0) {
+        total_size += 2;
+      }
+    }
+  }
+  return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                             &this_._impl_._cached_size_);
+}
+
+void RegisterResponse::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<RegisterResponse*>(&to_msg);
+  auto& from = static_cast<const RegisterResponse&>(from_msg);
+  ::google::protobuf::Arena* arena = _this->GetArena();
+  // @@protoc_insertion_point(class_specific_merge_from_start:fixbug.RegisterResponse)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._impl_._has_bits_[0];
+  if ((cached_has_bits & 0x00000003u) != 0) {
+    if ((cached_has_bits & 0x00000001u) != 0) {
+      ABSL_DCHECK(from._impl_.rescode_ != nullptr);
+      if (_this->_impl_.rescode_ == nullptr) {
+        _this->_impl_.rescode_ = ::google::protobuf::Message::CopyConstruct(arena, *from._impl_.rescode_);
+      } else {
+        _this->_impl_.rescode_->MergeFrom(*from._impl_.rescode_);
+      }
+    }
+    if ((cached_has_bits & 0x00000002u) != 0) {
+      if (from._internal_success() != 0) {
+        _this->_impl_.success_ = from._impl_.success_;
+      }
+    }
+  }
+  _this->_impl_._has_bits_[0] |= cached_has_bits;
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void RegisterResponse::CopyFrom(const RegisterResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:fixbug.RegisterResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void RegisterResponse::InternalSwap(RegisterResponse* PROTOBUF_RESTRICT PROTOBUF_NONNULL other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(RegisterResponse, _impl_.success_)
+      + sizeof(RegisterResponse::_impl_.success_)
+      - PROTOBUF_FIELD_OFFSET(RegisterResponse, _impl_.rescode_)>(
+          reinterpret_cast<char*>(&_impl_.rescode_),
+          reinterpret_cast<char*>(&other->_impl_.rescode_));
+}
+
+::google::protobuf::Metadata RegisterResponse::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
 const ::google::protobuf::ServiceDescriptor* PROTOBUF_NONNULL UserServiceRpc::descriptor() {
   ::google::protobuf::internal::AssignDescriptors(&descriptor_table_user_2eproto);
   return file_level_service_descriptors_user_2eproto[0];
@@ -1099,6 +1820,13 @@ void UserServiceRpc::Login(::google::protobuf::RpcController* PROTOBUF_NULLABLE 
   controller->SetFailed("Method Login() not implemented.");
   done->Run();
 }
+void UserServiceRpc::Register(::google::protobuf::RpcController* PROTOBUF_NULLABLE controller,
+                         const ::fixbug::RegisterRequest* PROTOBUF_NONNULL,
+                         ::fixbug::RegisterResponse* PROTOBUF_NONNULL,
+                         ::google::protobuf::Closure* PROTOBUF_NULLABLE done) {
+  controller->SetFailed("Method Register() not implemented.");
+  done->Run();
+}
 
 void UserServiceRpc::CallMethod(
     const ::google::protobuf::MethodDescriptor* PROTOBUF_NONNULL method,
@@ -1110,6 +1838,10 @@ void UserServiceRpc::CallMethod(
     case 0:
       this->Login(controller, ::google::protobuf::DownCastMessage<::fixbug::LoginRequest>(request),
                    ::google::protobuf::DownCastMessage<::fixbug::LoginResponse>(response), done);
+      break;
+    case 1:
+      this->Register(controller, ::google::protobuf::DownCastMessage<::fixbug::RegisterRequest>(request),
+                   ::google::protobuf::DownCastMessage<::fixbug::RegisterResponse>(response), done);
       break;
 
     default:
@@ -1124,6 +1856,8 @@ const ::google::protobuf::Message& UserServiceRpc::GetRequestPrototype(
   switch (method->index()) {
     case 0:
       return ::fixbug::LoginRequest::default_instance();
+    case 1:
+      return ::fixbug::RegisterRequest::default_instance();
 
     default:
       ABSL_LOG(FATAL) << "Bad method index; this should never happen.";
@@ -1138,6 +1872,8 @@ const ::google::protobuf::Message& UserServiceRpc::GetResponsePrototype(
   switch (method->index()) {
     case 0:
       return ::fixbug::LoginResponse::default_instance();
+    case 1:
+      return ::fixbug::RegisterResponse::default_instance();
 
     default:
       ABSL_LOG(FATAL) << "Bad method index; this should never happen.";
@@ -1164,6 +1900,13 @@ void UserServiceRpc_Stub::Login(
     const ::fixbug::LoginRequest* PROTOBUF_NONNULL request, ::fixbug::LoginResponse* PROTOBUF_NONNULL response,
     ::google::protobuf::Closure* PROTOBUF_NULLABLE done) {
   channel_->CallMethod(descriptor()->method(0), controller,
+                       request, response, done);
+}
+void UserServiceRpc_Stub::Register(
+    ::google::protobuf::RpcController* PROTOBUF_NULLABLE controller,
+    const ::fixbug::RegisterRequest* PROTOBUF_NONNULL request, ::fixbug::RegisterResponse* PROTOBUF_NONNULL response,
+    ::google::protobuf::Closure* PROTOBUF_NULLABLE done) {
+  channel_->CallMethod(descriptor()->method(1), controller,
                        request, response, done);
 }
 // @@protoc_insertion_point(namespace_scope)
