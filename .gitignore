@@ -1,6 +1,16 @@
 .vs/
 out/
 build/
+bin/
+lib/
+
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/Makefile
+**/.ninja_deps
+**/.ninja_log
+**/Testing/
 
 CMakeUserPresets.json
 
@@ -12,6 +22,12 @@ CMakeUserPresets.json
 *.dll
 *.lib
 *.exp
+*.a
 
 *.user
 *.suo
+
+tests/protobuf/build/
+tests/protobuf/build-standalone/
+tests/protobuf/test.pb.cc
+tests/protobuf/test.pb.h
