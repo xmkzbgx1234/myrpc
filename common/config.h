@@ -1,3 +1,5 @@
+# pragma once
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -67,6 +69,7 @@ private:
 
 // 模板特化实现类型转换
 template<>
+inline
 std::string Config::get<std::string>(const std::string& section, const std::string& key, const std::string& defaultVal) const {
     auto secIt = data_.find(section);
     if (secIt == data_.end()) return defaultVal;
@@ -75,6 +78,7 @@ std::string Config::get<std::string>(const std::string& section, const std::stri
 }
 
 template<>
+inline
 int Config::get<int>(const std::string& section, const std::string& key, const int& defaultVal) const {
     std::string val = get<std::string>(section, key, "");
     if (val.empty()) return defaultVal;
@@ -87,6 +91,7 @@ int Config::get<int>(const std::string& section, const std::string& key, const i
 }
 
 template<>
+inline
 bool Config::get<bool>(const std::string& section, const std::string& key, const bool& defaultVal) const {
     std::string val = get<std::string>(section, key, "");
     if (val.empty()) return defaultVal;
@@ -100,12 +105,15 @@ struct ServerConfig {
 
     // 从 Config 对象加载自身
     void loadFrom(const Config& cfg) {
-        host = cfg.get<std::string>("server", "host", "localhost");
-        port = cfg.get<int>("server", "port", 8080);
+        host = cfg.get<std::string>("rpcserver", "rpcserverip", "localhost");
+        port = cfg.get<int>("rpcserver", "rpcserverport", 8080);
 
         // 可选：强制校验关键配置是否存在
-        if (!cfg.has("server", "host")) {
-            throw ConfigException("Missing critical config: server.host");
+        if (!cfg.has("rpcserver", "rpcserverip")) {
+            throw ConfigException("Missing critical config: rpcserver.rpcserverip");
+        }
+        if(!cfg.has("rpcserver", "rpcserverport")) {
+            throw ConfigException("Missing critical config: rpcserver.rpcserverport");
         }
     }
 };
