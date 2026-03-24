@@ -5,6 +5,8 @@ MyRpcController::MyRpcController() {
     error_text_ = "";
 }
 
+MyRpcController::~MyRpcController() = default;
+
 void MyRpcController::Reset() {
     is_failed_ = false;
     error_text_ = "";
