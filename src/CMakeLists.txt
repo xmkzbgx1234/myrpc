@@ -3,6 +3,7 @@ add_library(myrpc
   include/MyRpcProvider.cc
   include/MyRpcChannel.cc
   include/rpcHeader.pb.cc
+  include/MyRpcController.cc
 )
 
 target_include_directories(myrpc

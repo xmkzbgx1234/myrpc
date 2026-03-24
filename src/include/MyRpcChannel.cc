@@ -27,6 +27,7 @@ void MyRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* methodDe
         args_size = args.size();
     } else {
         // 序列化失败，进行错误处理
+        controller->SetFailed("Failed to serialize request for method: " + service_name + "." + method_name);
         LOG(LogLevel::ERROR) << "Failed to serialize request for method: " << service_name << "." << method_name;
         return;
     }
@@ -42,6 +43,7 @@ void MyRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* methodDe
         header_size = header_str.size();
     } else {
         // 序列化失败，进行错误处理
+        controller->SetFailed("Failed to serialize RpcHeader for method: " + service_name + "." + method_name);
         LOG(LogLevel::ERROR) << "Failed to serialize RpcHeader for method: " << service_name << "." << method_name;
         return;
     }
@@ -65,6 +67,7 @@ void MyRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* methodDe
     // 使用TCP简易测试，发送Rpc请求
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if(sockfd < 0) {
+        controller->SetFailed("Failed to create socket");
         LOG(LogLevel::ERROR) << "Failed to create socket";
         return;
     }
@@ -74,12 +77,14 @@ void MyRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* methodDe
     server_addr.sin_addr.s_addr = inet_addr(server_ip.c_str());
     server_addr.sin_port = htons(server_port);
     if(connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        controller->SetFailed("Failed to connect to server");
         LOG(LogLevel::ERROR) << "Failed to connect to server";
         close(sockfd);
         return;
     }
     // 发送Rpc请求
     if(send(sockfd, rpc_request.c_str(), rpc_request.size(), 0) < 0) {
+        controller->SetFailed("Failed to send request to server");
         LOG(LogLevel::ERROR) << "Failed to send request to server";
         close(sockfd);
         return;
@@ -89,6 +94,7 @@ void MyRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* methodDe
     char buf[1024];
     int bytes_received = recv(sockfd, buf, sizeof(buf), 0);
     if(bytes_received <= 0) {
+        controller->SetFailed("Failed to receive response from server");
         LOG(LogLevel::ERROR) << "Failed to receive response from server";
         close(sockfd);
         return;
@@ -96,6 +102,7 @@ void MyRpcChannel::CallMethod(const google::protobuf::MethodDescriptor* methodDe
     // 解析Rpc响应
     std::string response_str(buf, bytes_received);
     if(!response->ParseFromString(response_str)) {
+        controller->SetFailed("Failed to parse response from server");
         LOG(LogLevel::ERROR) << "Failed to parse response from server";
         close(sockfd);
         return;
