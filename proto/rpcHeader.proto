@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package myrpc;
+
+message RpcRequestHeader {
+  uint32 magic = 1;
+  uint32 version = 2;
+  uint64 request_id = 3;
+  string service_name = 4;
+  string method_name = 5;
+  uint32 body_len = 6;
+}
+
+message RpcResponseHeader {
+  uint32 magic = 1;
+  uint32 version = 2;
+  uint64 request_id = 3;
+  uint32 body_len = 4;
+  int32 error_code = 5;
+  string error_msg = 6;
+}

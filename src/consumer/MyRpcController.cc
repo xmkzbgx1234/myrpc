@@ -1,11 +1,9 @@
-#include "MyRpcController.h"
+#include "myrpc/consumer/MyRpcController.h"
 
 MyRpcController::MyRpcController() {
     is_failed_ = false;
     error_text_ = "";
 }
-
-MyRpcController::~MyRpcController() = default;
 
 void MyRpcController::Reset() {
     is_failed_ = false;

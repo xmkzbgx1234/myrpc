@@ -1,5 +1,7 @@
-# pragma once
+#pragma once
+
 #include "config.h"
+
 class MyRpcApplication {
 
 public:

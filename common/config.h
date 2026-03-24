@@ -83,7 +83,7 @@ int Config::get<int>(const std::string& section, const std::string& key, const i
     std::string val = get<std::string>(section, key, "");
     if (val.empty()) return defaultVal;
     try {
-        return std::stoi(val);
+        return std::stoi(val, nullptr, 0);
     }
     catch (...) {
         throw ConfigException("Invalid integer format for [" + section + "]" + key);
@@ -102,11 +102,13 @@ bool Config::get<bool>(const std::string& section, const std::string& key, const
 struct ServerConfig {
     std::string host;
     int port;
+    uint32_t magic;
 
     // 从 Config 对象加载自身
     void loadFrom(const Config& cfg) {
         host = cfg.get<std::string>("rpcserver", "rpcserverip", "localhost");
         port = cfg.get<int>("rpcserver", "rpcserverport", 8080);
+        magic = cfg.get<int>("rpcserver", "magic", 0);
 
         // 可选：强制校验关键配置是否存在
         if (!cfg.has("rpcserver", "rpcserverip")) {
@@ -114,6 +116,12 @@ struct ServerConfig {
         }
         if(!cfg.has("rpcserver", "rpcserverport")) {
             throw ConfigException("Missing critical config: rpcserver.rpcserverport");
+        }
+        if(!cfg.has("rpcserver", "magic")) {
+            throw ConfigException("Missing critical config: rpcserver.magic");
+        }
+        if(magic == 0) {
+            throw ConfigException("Invalid magic number: 0");
         }
     }
 };

@@ -32,6 +32,8 @@ else()
   set(MYRPC_PROTOBUF_TARGET PkgConfig::PROTOBUF)
 endif()
 
+find_program(PROTOC_EXECUTABLE NAMES protoc REQUIRED)
+
 if(MYRPC_USE_MUDUO)
   set(MYRPC_MUDUO_ROOT "$ENV{HOME}/.local/muduo")
   set(MYRPC_LOCAL_BOOST_ROOT "$ENV{HOME}/.local/usr")
@@ -68,9 +70,10 @@ if(MYRPC_USE_MUDUO)
   )
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR}/src/include)
+include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/common)
 include_directories(${PROJECT_SOURCE_DIR}/examples)
+include_directories(${PROJECT_BINARY_DIR})
 
 add_subdirectory(common)
 if(EXISTS "${PROJECT_SOURCE_DIR}/src/CMakeLists.txt")

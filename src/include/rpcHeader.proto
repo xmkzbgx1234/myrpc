@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package myrpc;
-
-message myRpcHeader{
-    bytes service_name = 1;
-    bytes method_name = 2;
-    int32 args_size = 3;
-}

@@ -3,10 +3,10 @@
 #include <google/protobuf/service.h>
 #include <string>
 
-class MyRpcController : public google::protobuf::RpcController {
+class MyRpcController : public google::protobuf::RpcController{
 public:
   MyRpcController();
-  ~MyRpcController();
+  ~MyRpcController() override = default;
 
   // Client-side methods ---------------------------------------------
   // These calls may be made from the client side only.  Their results
@@ -14,7 +14,7 @@ public:
 
   // Resets the RpcController to its initial state so that it may be reused in
   // a new call.  Must not be called while an RPC is in progress.
-  void Reset() override;
+  void Reset();
 
   // After a call has finished, returns true if the call failed.  The possible
   // reasons for failure depend on the RPC implementation.  Failed() must not
