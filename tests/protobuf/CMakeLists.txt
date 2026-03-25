@@ -22,18 +22,14 @@ pkg_check_modules(PROTOBUF REQUIRED IMPORTED_TARGET protobuf)
 find_program(PROTOC_EXECUTABLE NAMES protoc REQUIRED)
 
 set(PROTO_FILE "${CMAKE_CURRENT_SOURCE_DIR}/test.proto")
-set(GENERATED_SRC "${CMAKE_CURRENT_BINARY_DIR}/test.pb.cc")
-set(GENERATED_HDR "${CMAKE_CURRENT_BINARY_DIR}/test.pb.h")
 
-add_custom_command(
-  OUTPUT "${GENERATED_SRC}" "${GENERATED_HDR}"
-  COMMAND "${PROTOC_EXECUTABLE}"
-          --cpp_out=${CMAKE_CURRENT_BINARY_DIR}
-          --proto_path=${CMAKE_CURRENT_SOURCE_DIR}
-          "${PROTO_FILE}"
-  DEPENDS "${PROTO_FILE}"
-  COMMENT "Generating C++ source from test.proto"
-  VERBATIM
+myrpc_generate_proto(
+  GENERATED_SRC
+  GENERATED_HDR
+  "${PROTO_FILE}"
+  "${CMAKE_CURRENT_BINARY_DIR}"
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "Generating C++ source from test.proto"
 )
 
 add_executable(protobuf_test

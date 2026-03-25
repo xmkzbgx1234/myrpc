@@ -7,7 +7,10 @@ class MyRpcApplication {
 public:
     static void Init(int argc, char** argv);
     static MyRpcApplication& GetInstance();
-    static ServerConfig& GetRpcServerConfig();
+    static ProviderConfig& GetRpcProviderConfig();
+    static ConsumerConfig& GetConsumerConfig();
+    static RedisConfig& GetRedisConfig();
+     static AppRole& GetRole();
     static void Destroy();
 
 private:
@@ -17,6 +20,9 @@ private:
     MyRpcApplication& operator=(const MyRpcApplication&) = delete;
     MyRpcApplication(MyRpcApplication&&) = delete;
 
-    static ServerConfig rpcServerConfig;
+    static ProviderConfig rpcProviderConfig;
+    static ConsumerConfig consumerConfig;
+    static RedisConfig redisConfig;
+    static AppRole role;
 
 };

@@ -1,4 +1,4 @@
-# pragma once
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -98,8 +98,14 @@ bool Config::get<bool>(const std::string& section, const std::string& key, const
     return (val == "true" || val == "1" || val == "yes");
 }
 
+enum class AppRole {
+    None = 0,
+    Provider,
+    Consumer
+};
+
 // 业务配置结构体
-struct ServerConfig {
+struct ProviderConfig {
     std::string host;
     int port;
     uint32_t magic;
@@ -109,19 +115,30 @@ struct ServerConfig {
         host = cfg.get<std::string>("rpcserver", "rpcserverip", "localhost");
         port = cfg.get<int>("rpcserver", "rpcserverport", 8080);
         magic = cfg.get<int>("rpcserver", "magic", 0);
+    }
+};
 
-        // 可选：强制校验关键配置是否存在
-        if (!cfg.has("rpcserver", "rpcserverip")) {
-            throw ConfigException("Missing critical config: rpcserver.rpcserverip");
-        }
-        if(!cfg.has("rpcserver", "rpcserverport")) {
-            throw ConfigException("Missing critical config: rpcserver.rpcserverport");
-        }
-        if(!cfg.has("rpcserver", "magic")) {
-            throw ConfigException("Missing critical config: rpcserver.magic");
-        }
-        if(magic == 0) {
-            throw ConfigException("Invalid magic number: 0");
-        }
+struct ConsumerConfig
+{
+    uint32_t magic;
+    int timeout_ms;
+
+    void loadFrom(const Config& cfg) {
+        magic = cfg.get<int>("consumer", "magic", 0);
+        timeout_ms = cfg.get<int>("consumer", "timeout_ms", 10000);
+    }
+};
+
+struct RedisConfig {
+    std::string host;
+    int port;
+    std::string password;
+    int db;
+
+    void loadFrom(const Config& cfg) {
+        host = cfg.get<std::string>("redis", "host", "127.0.0.1");
+        port = cfg.get<int>("redis", "port", 6379);
+        password = cfg.get<std::string>("redis", "password", "");
+        db = cfg.get<int>("redis", "db", 0);
     }
 };

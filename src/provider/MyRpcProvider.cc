@@ -1,7 +1,15 @@
 #include "myrpc/provider/MyRpcProvider.h"
 #include "myrpc/application/MyRpcApplication.h"
-#include "log.h"
-#include "rpcHeader.pb.h"
+
+namespace {
+
+struct ParsedRequest {
+    uint64_t request_id = 0;
+    std::string service_name;
+    std::string method_name;
+    std::string body;
+};
+}  // namespace
 
 void MyRpcProvider::NotifyService(google::protobuf::Service* service) {
     // 把服务对象发布到rpc节点上
@@ -21,10 +29,17 @@ void MyRpcProvider::NotifyService(google::protobuf::Service* service) {
 
 void MyRpcProvider::Run() {
     // 启动rpc服务，开始提供rpc远程调用服务
-    std::string ip = MyRpcApplication::GetRpcServerConfig().host;
-    uint16_t port = MyRpcApplication::GetRpcServerConfig().port;
+    std::string ip = MyRpcApplication::GetRpcProviderConfig().host;
+    uint16_t port = MyRpcApplication::GetRpcProviderConfig().port;
     muduo::net::InetAddress listenAddr(ip, port);
     LOG(LogLevel::INFO) << "Creating MyRpcProvider server at " << ip << ":" << port;
+
+    RedisRegistry registry;
+    std::string endpoint = ip + ":" + std::to_string(port);
+    for (const auto& [service_name, service_info] : serviceMap) {
+        registry.RegisterService(service_name, endpoint);
+    }
+
     // 创建TcpServer对象
     muduo::net::TcpServer server(&loop, listenAddr, "MyRpcProvider");
     // 设置线程数量，默认为0表示不启用线程池
@@ -52,135 +67,146 @@ void MyRpcProvider::OnConnection(const muduo::net::TcpConnectionPtr& conn) {
 // 数据格式：
 // old : header_size(4字节) + serviceName + methodName + args_size(4字节) + args
 // RpcRequestHeader : header_size(4) + magic + version + request_id(8) + serviceName + methodName + body_len(4) + body
-
 void MyRpcProvider::OnMessage(const muduo::net::TcpConnectionPtr& conn,
                                 muduo::net::Buffer* buffer,
                                 muduo::Timestamp receiveTime) {
-    // 处理Rpc请求的消息
-    // 1. 从buffer中读取数据，解析出Rpc请求
-    // 2. 根据请求调用相应的服务方法，获取结果
-    // 3. 将结果封装成Rpc响应，发送回客户端
-    std::string recvBuf = buffer->retrieveAllAsString();
-    LOG(LogLevel::INFO) << "Received message: " << recvBuf;
-    myrpc::RpcRequestHeader requestHeader;
-    uint32_t requestMagic = 0;
-    uint32_t requestHeaderLen = 0;
-    uint32_t requestVersion = 0;
-    uint64_t requestId = 0;
-    std::string serviceName;
-    std::string methodName;
-    std::string body;
-    uint32_t bodyLen;
-    // 解析Rpc请求
-    if (recvBuf.size() < 4) {
-        LOG(LogLevel::ERROR) << "Invalid message received: too short for header size";
-        return;
-    }
-    recvBuf.copy(reinterpret_cast<char*>(&requestHeaderLen), sizeof(requestHeaderLen), 0);
-    // 校验请求头长度是否有效
-    if (recvBuf.size() < 4 + requestHeaderLen) {
-        LOG(LogLevel::ERROR) << "Invalid message received: incomplete request header";
-        return;
-    }
-    std::string requestHeaderStr(recvBuf.begin() + 4, recvBuf.begin() + 4 + requestHeaderLen);
-    if(requestHeader.ParseFromString(requestHeaderStr)){
-        requestMagic = requestHeader.magic();
-        if(requestMagic != MyRpcApplication::GetRpcServerConfig().magic){
-            LOG(LogLevel::ERROR) << "Invalid magic number: " << requestMagic;
+    // 循环处理多个请求包
+    while (true) {
+        if (buffer->readableBytes() < sizeof(uint32_t)) {
             return;
         }
-        requestVersion = requestHeader.version();
-        // 校验版本号，目前只支持版本1
-        switch(requestVersion){
-            case 1:
-                break;
-            default:
-                LOG(LogLevel::ERROR) << "Invalid version: " << requestVersion;
-                return;
-        }
-        requestId = requestHeader.request_id();
-        serviceName = requestHeader.service_name();
-        methodName = requestHeader.method_name();
-        bodyLen = requestHeader.body_len();
-        // 校验请求体长度是否有效
-        if (recvBuf.size() < 4 + requestHeaderLen + bodyLen) {
-            LOG(LogLevel::ERROR) << "Invalid message received: incomplete request body";
+        const char* data = buffer->peek();
+        uint32_t header_len = 0;
+        memcpy(&header_len, data, sizeof(uint32_t));
+        if (buffer->readableBytes() < sizeof(uint32_t) + header_len) {
             return;
         }
-        body = recvBuf.substr(4 + requestHeaderLen, bodyLen);
-        LOG(LogLevel::INFO) << "----------------------------------------";
-        LOG(LogLevel::INFO) << "Parsed Rpc request: magic=" << requestMagic
-                    << ", version=" << requestVersion
-                    << ", request_id=" << requestId
-                    << ", service=" << serviceName
-                    << ", method=" << methodName
-                    << ", body_len=" << bodyLen
-                    << ", body=" << body;
-        LOG(LogLevel::INFO) << "----------------------------------------";
-    } else {
-        LOG(LogLevel::ERROR) << "Failed to parse Rpc request";
+        myrpc::RpcRequestHeader request_header;
+        std::string header_str(data + sizeof(uint32_t), header_len);
+        if (!request_header.ParseFromString(header_str)) {
+            LOG(LogLevel::ERROR) << "Failed to parse Rpc request header";
+            buffer->retrieveAll();
+            return;
+        }
+        uint32_t body_len = request_header.body_len();
+        uint32_t total_len = sizeof(uint32_t) + header_len + body_len;
+        if (buffer->readableBytes() < total_len) {
+            return;
+        }
+        std::string body(data + sizeof(uint32_t) + header_len, body_len);
+        buffer->retrieve(total_len);
+        // 这里处理一个完整请求
+        HandleRequest(conn, request_header, body, MyRpcApplication::GetRpcProviderConfig().magic);
+    }
+}
+
+void MyRpcProvider::HandleRequest(const muduo::net::TcpConnectionPtr& conn,
+                  const myrpc::RpcRequestHeader& request_header,
+                  const std::string& body, uint32_t expected_magic) {
+    LOG(LogLevel::INFO) << "Received request: " << request_header.DebugString() << ", body=" << body;
+    // 校验requestHeader
+    if(request_header.magic() != expected_magic) {
+        sendErrorResponse(conn, request_header.request_id(), myrpc::RPC_INVALID_MAGIC, "Invalid magic number");
+        LOG(LogLevel::ERROR) << "Invalid magic number: " << request_header.magic();
+        return;
+    }
+    if(request_header.version() != 1) {
+        sendErrorResponse(conn, request_header.request_id(), myrpc::RPC_UNSUPPORTED_VERSION, "Unsupported version");
+        LOG(LogLevel::ERROR) << "Unsupported version: " << request_header.version();
         return;
     }
 
-    // 2. 根据请求调用相应的服务方法，获取结果
-    auto service_it = serviceMap.find(serviceName);
+    // 查找服务对象和方法
+    auto service_it = serviceMap.find(request_header.service_name());
     if(service_it == serviceMap.end()){
-        LOG(LogLevel::ERROR) << "Service not found: " << serviceName;
+        // 服务对象不存在
+        sendErrorResponse(conn, request_header.request_id(), myrpc::RPC_SERVICE_NOT_FOUND, "Service not found");
+        LOG(LogLevel::ERROR) << "Service not found: " << request_header.service_name();
         return;
     }
-    auto method_it = service_it->second.methodMap.find(methodName);
+    auto method_it = service_it->second.methodMap.find(request_header.method_name());
     if(method_it == service_it->second.methodMap.end()){
-        LOG(LogLevel::ERROR) << "Method not found: " << methodName;
+        // 方法不存在
+        sendErrorResponse(conn, request_header.request_id(), myrpc::RPC_METHOD_NOT_FOUND, "Method not found");
+        LOG(LogLevel::ERROR) << "Method not found: " << request_header.method_name();
         return;
     }
     google::protobuf::Service* service = service_it->second.service;
     const google::protobuf::MethodDescriptor* methodDesc = method_it->second;
-
-    // 调用服务方法
-    // 1. 创建请求消息和响应消息
     std::shared_ptr<google::protobuf::Message> request = std::shared_ptr<google::protobuf::Message>(service->GetRequestPrototype(methodDesc).New());
     std::shared_ptr<google::protobuf::Message> response = std::shared_ptr<google::protobuf::Message>(service->GetResponsePrototype(methodDesc).New());
     if(!request->ParseFromString(body)){
+        sendErrorResponse(conn, request_header.request_id(), myrpc::RPC_REQUEST_PARSE_ERROR,
+                          "Failed to parse request body");
         LOG(LogLevel::ERROR) << "Failed to parse request body";
         return;
     }
 
-    // 3. 创建Rpc上下文
-    RpcResponseContext rpcContext(conn, request, response, requestId);
-
+    MyRpcProvider::RpcResponseContext rpcContext(conn, request, response, request_header.request_id());
     google::protobuf::Closure* done =
-                        google::protobuf::NewCallback(
-                                        this, &MyRpcProvider::sendRpcResponse, rpcContext);
-
-    // 2. 在框架中根据方法描述调用RPC上发布的服务方法
-    // 等价于userService.Login(request);
+                            google::protobuf::NewCallback(this, &MyRpcProvider::sendRpcResponse, rpcContext);
     service->CallMethod(methodDesc, nullptr, request.get(), response.get(), done);
 }
 
 // RpcResponseHeader : header_size(4) + magic + version + response_id(8) + errcode(4) + message_len(4) + message
-
+// 发送正常Rpc响应
 void MyRpcProvider::sendRpcResponse(RpcResponseContext rpcContext) {
     std::string responseStr;
-
-    if(rpcContext.response->SerializeToString(&responseStr)){
-        myrpc::RpcResponseHeader responseHeader;
-        responseHeader.set_body_len(responseStr.size());
-        responseHeader.set_magic(MyRpcApplication::GetRpcServerConfig().magic);
-        responseHeader.set_version(1);
-        responseHeader.set_request_id(rpcContext.request_id);
-        responseHeader.set_error_code(0);
-        responseHeader.set_error_msg("");
-        std::string headerStr = responseHeader.SerializeAsString();
-        uint32_t headerLen = headerStr.size();
-        std::string packet;
-        packet.append(reinterpret_cast<char*>(&headerLen), 4);
-        packet.append(headerStr);
-        packet.append(responseStr);
-        rpcContext.conn->send(packet);
-    } else {
-        LOG(LogLevel::ERROR) << "Failed to serialize response";
-        rpcContext.conn->shutdown();
+    if (!rpcContext.response->SerializeToString(&responseStr)) {
+        // 序列化响应体失败，发送错误响应
+        sendErrorResponse(rpcContext.conn,
+                          rpcContext.request_id,
+                          myrpc::RPC_RESPONSE_SERIALIZE_ERROR,
+                          "Failed to serialize response");
         return;
     }
+    myrpc::RpcResponseHeader responseHeader;
+    responseHeader.set_magic(MyRpcApplication::GetRpcProviderConfig().magic);
+    responseHeader.set_version(1);
+    responseHeader.set_request_id(rpcContext.request_id);
+    responseHeader.set_body_len(responseStr.size());
+    responseHeader.set_error_code(myrpc::RPC_OK);
+    responseHeader.set_error_msg("");
+    std::string headerStr;
+    if (!responseHeader.SerializeToString(&headerStr)) {
+        // 序列化响应头失败，发送错误响应
+        sendErrorResponse(rpcContext.conn,
+                          rpcContext.request_id,
+                          myrpc::RPC_INTERNAL_ERROR,
+                          "Failed to serialize response header");
+        return;
+    }
+    uint32_t headerLen = headerStr.size();
+    std::string packet;
+    packet.append(reinterpret_cast<char*>(&headerLen), 4);
+    packet.append(headerStr);
+    packet.append(responseStr);
+    rpcContext.conn->send(packet);
     rpcContext.conn->shutdown();
-   }
+}
+
+// 发送错误响应
+void MyRpcProvider::sendErrorResponse(const muduo::net::TcpConnectionPtr& conn,
+                                      uint64_t requestId,
+                                      int errorCode,
+                                      const std::string& errorMsg) {
+    myrpc::RpcResponseHeader responseHeader;
+    responseHeader.set_magic(MyRpcApplication::GetRpcProviderConfig().magic);
+    responseHeader.set_version(1);
+    responseHeader.set_request_id(requestId);
+    responseHeader.set_body_len(0);
+    responseHeader.set_error_code(errorCode);
+    responseHeader.set_error_msg(errorMsg);
+    std::string headerStr;
+    if (!responseHeader.SerializeToString(&headerStr)) {
+        LOG(LogLevel::ERROR) << "Failed to serialize error response header";
+        conn->shutdown();
+        return;
+    }
+    uint32_t headerLen = headerStr.size();
+    std::string packet;
+    packet.append(reinterpret_cast<char*>(&headerLen), 4);
+    packet.append(headerStr);
+    conn->send(packet);
+    conn->shutdown();
+}

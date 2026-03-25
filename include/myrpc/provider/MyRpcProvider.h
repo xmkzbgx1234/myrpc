@@ -9,6 +9,10 @@
 #include <functional>
 #include <string>
 #include <google/protobuf/descriptor.h>
+#include "log.h"
+#include "rpcHeader.pb.h"
+#include "myrpc/protocol/ErrorCode.h"
+#include "myrpc/registry/RedisRegistry.h"
 
 class MyRpcProvider
 {
@@ -43,4 +47,11 @@ public:
     void NotifyService(google::protobuf::Service* service);
     void Run();
     void sendRpcResponse(RpcResponseContext rpcContext);
+    void sendErrorResponse(const muduo::net::TcpConnectionPtr& conn,
+                              uint64_t requestId,
+                              int errorCode,
+                              const std::string& errorMsg);
+    void HandleRequest(const muduo::net::TcpConnectionPtr& conn,
+                  const myrpc::RpcRequestHeader& request_header,
+                  const std::string& body, uint32_t expected_magic);
 };

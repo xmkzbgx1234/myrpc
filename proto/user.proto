@@ -27,10 +27,22 @@ message RegisterRequest{
 message RegisterResponse{
     ResultCode rescode = 1;
     bool success = 2;
+}
 
+message FriendListRequest {
+    int32 userid = 1;
+}
+
+message FriendListResponse {
+    ResultCode rescode = 1;
+    repeated bytes friends = 2;
 }
 
 service UserServiceRpc{
     rpc Login(LoginRequest) returns(LoginResponse);
     rpc Register(RegisterRequest) returns(RegisterResponse);
+}
+
+service FriendServiceRpc {
+    rpc GetFriendList(FriendListRequest) returns(FriendListResponse);
 }

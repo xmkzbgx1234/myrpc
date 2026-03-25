@@ -5,8 +5,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 option(MYRPC_BUILD_TESTS "Build all tests" ON)
 option(MYRPC_BUILD_PROTOBUF_TESTS "Build protobuf tests" ON)
+option(MYRPC_BUILD_EXAMPLES "Build example applications" ON)
 option(MYRPC_USE_MUDUO "Enable locally installed muduo support" ON)
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -33,6 +36,36 @@ else()
 endif()
 
 find_program(PROTOC_EXECUTABLE NAMES protoc REQUIRED)
+find_path(HIREDIS_INCLUDE_DIR hiredis/hiredis.h)
+find_library(HIREDIS_LIBRARY hiredis)
+
+if(HIREDIS_INCLUDE_DIR AND HIREDIS_LIBRARY)
+  add_library(myrpc_hiredis INTERFACE)
+  add_library(myrpc::hiredis ALIAS myrpc_hiredis)
+  target_include_directories(myrpc_hiredis INTERFACE ${HIREDIS_INCLUDE_DIR})
+  target_link_libraries(myrpc_hiredis INTERFACE ${HIREDIS_LIBRARY})
+endif()
+
+function(myrpc_generate_proto out_src out_hdr proto_file out_dir proto_root comment_text)
+  get_filename_component(_proto_name "${proto_file}" NAME_WE)
+  set(_src "${out_dir}/${_proto_name}.pb.cc")
+  set(_hdr "${out_dir}/${_proto_name}.pb.h")
+
+  add_custom_command(
+    OUTPUT "${_src}" "${_hdr}"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${out_dir}"
+    COMMAND "${PROTOC_EXECUTABLE}"
+            --cpp_out=${out_dir}
+            --proto_path=${proto_root}
+            "${proto_file}"
+    DEPENDS "${proto_file}"
+    COMMENT "${comment_text}"
+    VERBATIM
+  )
+
+  set(${out_src} "${_src}" PARENT_SCOPE)
+  set(${out_hdr} "${_hdr}" PARENT_SCOPE)
+endfunction()
 
 if(MYRPC_USE_MUDUO)
   set(MYRPC_MUDUO_ROOT "$ENV{HOME}/.local/muduo")
@@ -70,16 +103,13 @@ if(MYRPC_USE_MUDUO)
   )
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${PROJECT_SOURCE_DIR}/common)
-include_directories(${PROJECT_SOURCE_DIR}/examples)
-include_directories(${PROJECT_BINARY_DIR})
-
 add_subdirectory(common)
 if(EXISTS "${PROJECT_SOURCE_DIR}/src/CMakeLists.txt")
   add_subdirectory(src)
 endif()
-add_subdirectory(examples)
+if(MYRPC_BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
 
 if(MYRPC_BUILD_TESTS)
   include(CTest)

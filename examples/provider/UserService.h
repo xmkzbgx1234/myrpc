@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include "user.pb.h"
 #include <string>
@@ -41,11 +43,3 @@ public:
         done->Run();
     }
 };
-
-int main(int argc, char** argv) {
-    MyRpcApplication::Init(argc, argv);
-    MyRpcProvider provider;
-    provider.NotifyService(new UserService());
-    provider.Run();
-    return 0;
-}
